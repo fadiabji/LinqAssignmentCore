@@ -1,0 +1,32 @@
+﻿@model IEnumerable<LinqAssignmentCore.Models.ViewModels.GroupJoinSelectManyVM>
+
+@{
+    ViewBag.Title = "JoinAndGroupAndSelectManyQ";
+}
+
+<h2>JoinAndGroupAndSelectManyQ - most efficient cars by country</h2>
+
+@foreach (var item in Model)
+{
+<div class="row">
+    <div class="col-lg-8">
+        <div class="col-lg-4">@item.Country</div>
+    </div>
+
+    @foreach (var carbrand in item.CarBrands)
+    {
+        <div class="row">
+            <div class="col-lg-offset-1 col-lg-8">
+                <div class="col-lg-6">@carbrand.Manufacturer  - @carbrand.Name</div>
+                <div class="col-lg-6">@carbrand.Combined</div>
+            </div>
+        </div>
+    }
+
+</div>
+    <div class="row">
+        **********************************************************************************
+        **********************************
+    </div>
+}
+

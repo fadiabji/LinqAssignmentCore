@@ -1,0 +1,31 @@
+﻿@model IEnumerable<LinqAssignmentCore.Models.ViewModels.GroupingVM>
+
+@{
+    ViewBag.Title = "GroupingQ";
+}
+
+<h2>Top 2 fuel efficient models per brand using grouping</h2>
+
+
+
+
+@foreach (var item in Model)
+{
+    <div class="row">
+        <div class="col-lg-10 h3">
+            @Html.DisplayFor(modelItem => item.Manufacturer)
+        </div>
+    </div>
+    foreach (var car in item.Cars)
+    {
+<div class="row">
+    <div class="col-lg-4 h4">
+        @Html.DisplayFor(model => car.Name)
+    </div>
+    <div class="col-lg-4 h4">
+        Efficiency: @Html.DisplayFor(model => car.Combined)
+    </div>
+</div>
+    }
+}
+

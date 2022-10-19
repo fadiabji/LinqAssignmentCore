@@ -1,0 +1,67 @@
+﻿@model IEnumerable<LinqAssignmentCore.Models.Db.Car>
+
+@{
+    ViewBag.Title = "MostEfficientQ";
+}
+
+<h2>MostEfficientQ</h2>
+
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Year)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Manufacturer)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Displacement)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cylinders)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.City)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Highway)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Combined)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Year)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Manufacturer)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Displacement)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Cylinders)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.City)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Highway)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Combined)
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,23 @@
+﻿@model IEnumerable<LinqAssignmentCore.Models.ViewModels.ProjectedCarsVM>
+@{
+    ViewBag.Title = "ProjectedSelect";
+}
+
+<h2>Projected Select Ordered list of new objects (fewer properties) - Query Syntax</h2>
+
+<partial name="_ProjectedSelectPartial" model="Model" />
+@*<div class="row">
+        <div class="col-lg-3 h4">@Html.DisplayNameFor(model => model.Manufacturer)</div>
+        <div class="col-lg-3 h4">@Html.DisplayNameFor(model => model.Name)</div>
+        <div class="col-lg-3 h4">@Html.DisplayNameFor(model => model.Combined)</div>
+    </div>
+
+    @foreach (var item in Model)
+    {
+        <div class="row">
+            <div class="col-lg-3">@item.Manufacturer</div>
+            <div class="col-lg-3">@item.Name</div>
+            <div class="col-lg-3">@item.Combined</div>
+        </div>
+    }*@
+

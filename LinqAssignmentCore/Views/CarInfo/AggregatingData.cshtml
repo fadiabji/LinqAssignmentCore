@@ -1,0 +1,43 @@
+﻿@model IEnumerable<LinqAssignmentCore.Models.ViewModels.AggregatingVM>
+
+@{
+    ViewBag.Title = "AggregatingData";
+}
+
+<h2>Aggregating Data - Combined efficiency values by manufacturer</h2>
+
+
+<table class="table">
+    <tr>
+        <th>
+            <label for="Name"></label>
+        </th>
+        <th>
+            <label for="Max"></label>
+        </th>
+        <th>
+            <label for="Min"></label>
+        </th>
+        <th>
+            <label for="Name"></label>
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+                <label>@item.Name</label>
+        </td>
+        <td>
+                <label>@item.Max</label>
+        </td>
+        <td>
+                <label>@item.Min</label>
+        </td>
+        <td>
+                <label>@Math.Round(item.Average, 2)</label>
+        </td>
+    </tr>
+}
+
+</table>
