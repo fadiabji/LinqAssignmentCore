@@ -3,6 +3,7 @@ using LinqAssignmentCore.Models;
 using Microsoft.AspNetCore.Mvc;
 using LinqAssignmentCore.Data;
 using LinqAssignmentCore.Models.ViewModels;
+using System.Xml.Linq;
 
 namespace LinqAssignmentCore.Controllers
 {
@@ -39,30 +40,32 @@ namespace LinqAssignmentCore.Controllers
         // Most fuel efficient cars - (extension) method syntax
         public ActionResult MostEfficient()
         {
-            //Take then ToList() more effictient
-            
-
-            return View();
+            var Top10EfficientCars = _db.Cars.OrderByDescending(c => c.Combined).ThenByDescending(c => c.Name).Take(10).ToList();
+            return View(Top10EfficientCars);
         }
 
         // Most fuel efficient car - query syntax
         public ActionResult MostEfficientQ()
         {
-            
-            return View();
+            var QTop10EfficientCars = (from c in _db.Cars
+                              select c).OrderByDescending(c => c.Combined).ThenByDescending(c =>c.Name).Take(10).ToList();
+            return View(QTop10EfficientCars);
         }
 
         // Filtering with Where and FirstOrDefault - (extension) method syntax
         public ActionResult WhereAndFirst()
         {
-            return View();
+            var TheMostFuleEfficientOfOneManufacture = _db.Cars.Where(c => c.Year == 2016 && c.Manufacturer == "BMW").OrderByDescending(c => c.Combined).FirstOrDefault();
+            return View(TheMostFuleEfficientOfOneManufacture);
         }
 
         // Filtering with Where and FirstOrDefault - query syntax
         public ActionResult WhereAndFirstQ()
         {
-            
-            return View();
+            var QTheMostFuleEfficientOfOneManufactur = (from  c in _db.Cars
+                                                        where c.Year == 2016 && c.Manufacturer == "BMW"
+                                                        select c).OrderByDescending(c =>c.Combined).FirstOrDefault();
+            return View(QTheMostFuleEfficientOfOneManufactur);
         }
 
         //Use 'Any' when checking if at least one item meet condition (true/false)
