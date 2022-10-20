@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using LinqAssignmentCore.Data;
 using LinqAssignmentCore.Models.ViewModels;
 using System.Xml.Linq;
+using System.Diagnostics.CodeAnalysis;
+using Microsoft.EntityFrameworkCore;
 
 namespace LinqAssignmentCore.Controllers
 {
@@ -55,17 +57,25 @@ namespace LinqAssignmentCore.Controllers
         // Filtering with Where and FirstOrDefault - (extension) method syntax
         public ActionResult WhereAndFirst()
         {
+            if (_db.Cars.Any(c => c.Name == "BMW")) { 
             var TheMostFuleEfficientOfOneManufacture = _db.Cars.Where(c => c.Year == 2016 && c.Manufacturer == "BMW").OrderByDescending(c => c.Combined).FirstOrDefault();
-            return View(TheMostFuleEfficientOfOneManufacture);
+                return View(TheMostFuleEfficientOfOneManufacture);
+            }else
+                return View(null);
+
         }
 
         // Filtering with Where and FirstOrDefault - query syntax
         public ActionResult WhereAndFirstQ()
         {
-            var QTheMostFuleEfficientOfOneManufactur = (from  c in _db.Cars
-                                                        where c.Year == 2016 && c.Manufacturer == "BMW"
-                                                        select c).OrderByDescending(c =>c.Combined).FirstOrDefault();
-            return View(QTheMostFuleEfficientOfOneManufactur);
+            if (_db.Cars.Any(c => c.Name == "BMW"))
+            {
+                var QTheMostFuleEfficientOfOneManufactur = (from c in _db.Cars
+                                                            where c.Year == 2016 && c.Manufacturer == "BMW"
+                                                            select c).OrderByDescending(c => c.Combined).FirstOrDefault();
+                return View(QTheMostFuleEfficientOfOneManufactur);
+            }
+            return View();
         }
 
         //Use 'Any' when checking if at least one item meet condition (true/false)
@@ -88,18 +98,30 @@ namespace LinqAssignmentCore.Controllers
         // Method syntax
         public ActionResult ProjectedSelect()
         {
-            
-            return View();
+            var Top10EfficientCars = _db.Cars.OrderByDescending(c => c.Combined).ThenByDescending(c => c.Name).Take(10).ToList();
+            var selectionTop10EfficientCars = Top10EfficientCars.Select( c => new ProjectedCarsVM { 
+                                                                                        Combined = c.Combined,
+                                                                                        Manufacturer = c.Manufacturer, 
+                                                                                        Name = c.Name});
+            return View(selectionTop10EfficientCars);
+
         }
 
         // Where condition with projected 'Select' - new objects with fewer properties
         // Query syntax
         public ActionResult ProjectedSelectQ()
         {
-            
+            var QTop10EfficientCars = (from c in _db.Cars
+                                       select c).OrderByDescending(c => c.Combined).ThenByDescending(c => c.Name).Take(10).ToList();
+            var QselectionTop10EfficientCars = from c in QTop10EfficientCars
+                                               select new ProjectedCarsVM()
+                                               {
+                                                   Name = c.Name,
+                                                   Combined = c.Combined,
+                                                   Manufacturer = c.Manufacturer
+                                               };
 
-            
-            return View();
+            return View(QselectionTop10EfficientCars);
         }
 
         // SelectMany in method syntax
@@ -108,8 +130,13 @@ namespace LinqAssignmentCore.Controllers
         // IEnumerable<char> characters is the same as a string
         public ActionResult SelectMany()
         {
+            var GroubedByNameList = _db.Cars.GroupBy(c => c.Name);
+            //var CarsNameList = (from c in GroubedByNameList
+            //                  select c.Key).ToList();
+            IEnumerable<char> carsChar = (from c in _db.Cars
+                                          select c).SelectMany(c => c.Name).Select(c=>c).ToList();
             
-            return View();
+            return View(carsChar);
         }
 
         // Join tables - query syntax
