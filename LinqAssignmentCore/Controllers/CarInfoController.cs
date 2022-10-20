@@ -6,6 +6,7 @@ using LinqAssignmentCore.Models.ViewModels;
 using System.Xml.Linq;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace LinqAssignmentCore.Controllers
 {
@@ -130,30 +131,47 @@ namespace LinqAssignmentCore.Controllers
         // IEnumerable<char> characters is the same as a string
         public ActionResult SelectMany()
         {
-            var GroubedByNameList = _db.Cars.GroupBy(c => c.Name);
-            //var CarsNameList = (from c in GroubedByNameList
-            //                  select c.Key).ToList();
-            IEnumerable<char> carsChar = (from c in _db.Cars
-                                          select c).SelectMany(c => c.Name).Select(c=>c).ToList();
-            
-            return View(carsChar);
+            List<char> CarsNamsChars = _db.Cars.ToList().SelectMany(c => c.Name).Distinct().OrderBy(c => c).ToList();
+            return View(CarsNamsChars);
         }
 
         // Join tables - query syntax
         public ActionResult JoinTablesQ()
         {
-
             
+            var carsNamesAndManfucturers = (from c in _db.Cars
+                        join m in _db.Manufacturers
+                             on c.Manufacturer equals m.Name
+                        select new JointTablesVM()
+                        {
+                            ModelName = c.Name,
+                            Combined = c.Combined,
+                            Manufacturer = c.Manufacturer,
+                            HeadQuarters = m.Headquarters,
+                        }).ToList();
 
-            return View();
+            var top10OfpreviousList = carsNamesAndManfucturers.OrderByDescending(c => c.Combined).ThenByDescending(c => c.ModelName).Take(10).ToList();
+
+
+            return View(top10OfpreviousList);
         }
 
         // Join tables - method syntax
         public ActionResult JoinTables()
         {
-            
+            var carsNamesAndManfucturers = _db.Cars.ToList().Join(_db.Manufacturers.ToList(),
+                                                                                c => c.Manufacturer,
+                                                                                m => m.Name, 
+                                                                                 (c,m) => new JointTablesVM
+                                                                                {
+                                                                                    Combined = c.Combined,
+                                                                                    Manufacturer = c.Manufacturer,
+                                                                                    ModelName = c.Name,
+                                                                                    HeadQuarters = m.Headquarters
+                                                                                });
+            var top10OfpreviousList = carsNamesAndManfucturers.OrderByDescending(c => c.Combined).ThenByDescending(c => c.ModelName).Take(10).ToList();
 
-            return View();
+            return View(top10OfpreviousList);
         }
 
         // Group by - query syntax
