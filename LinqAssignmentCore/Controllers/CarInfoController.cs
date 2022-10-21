@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace LinqAssignmentCore.Controllers
 {
@@ -177,17 +178,69 @@ namespace LinqAssignmentCore.Controllers
         // Group by - query syntax
         public ActionResult GroupingQ()
         {
-           
+            List<Car> initialCarlList = new List<Car>();
+            List<Car> finalCarsList = new List<Car>();
+            List<string> keysList = new List<string>();
+            var carSGroupedBy = (from c in _db.Cars
+                                 select c)
+                                 .ToList()
+                                 .GroupBy(c => c.Manufacturer);
+            foreach (var oneGroup in carSGroupedBy)
+            {
+                keysList.Add(oneGroup.Key);
+                foreach (Car c in oneGroup)
+                {
+                    initialCarlList.Add(c);
+                }
 
-            return View();
+                finalCarsList = (from car in initialCarlList
+                                 select car)
+                                 .OrderBy(c => c.Manufacturer)
+                                .ThenByDescending(c => c.Combined)
+                                .Take(2)
+                                .ToList();
+            }
+
+            var result = from c in finalCarsList
+                         from key in keysList
+                         select new GroupingVM()
+                            {
+                            Manufacturer = key,
+                            Cars = finalCarsList,
+                            };
+            return View(result);
         }
 
         // Group by - method syntax
         public ActionResult Grouping()
         {
-            
+            List<Car> initiaCarlList = new List<Car>();
+            List<Car> finalCarsList = new List<Car>();
+            List<string> keysList = new List<string>();
+            var carSGroupedBy = _db.Cars.ToList().GroupBy(c => c.Manufacturer);
+            foreach (var oneGroup in carSGroupedBy)
+            {
+                keysList.Add(oneGroup.Key);
+                foreach (Car c in oneGroup)
+                {
+                    initiaCarlList.Add(c);
+                }
 
-            return View();
+                finalCarsList = initiaCarlList
+                                .OrderBy(c => c.Manufacturer)
+                                .ThenByDescending(c => c.Combined)
+                                .Take(2)
+                                .ToList();
+            }
+
+            var finalResult = keysList
+                .Select(k => new GroupingVM 
+                {
+                    Manufacturer = k, 
+                    Cars = finalCarsList 
+                });
+            
+            return View(finalResult);
         }
 
         // combined group and join (get 2 properties from manufacturer) - query syntax
