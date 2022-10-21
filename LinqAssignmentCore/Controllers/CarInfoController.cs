@@ -283,9 +283,22 @@ namespace LinqAssignmentCore.Controllers
         // GroupJoin + SelectMany (flattening sequence) - query syntax
         public ActionResult JoinAndGroupAndSelectManyQ()
         {
-            
+            var groupJoinList = (from m in _db.Manufacturers.ToList()
+                               join c in _db.Cars.ToList()
+                               on m.Name equals c.Manufacturer
+                               into carsGruop
+                               select new GroupJoinSelectManyVM 
+                               {
+                                 Country = m.Headquarters,
+                                 CarBrands = _db.Cars.ToList()
+                               }).ToList();
 
-            return View();
+
+            var top3EfficientCarsByCountries = groupJoinList
+                                                .SelectMany(c => c.CarBrands)
+                                                .Distinct().OrderBy(c => c.Combined).Take(3).ToList();
+
+            return View(top3EfficientCarsByCountries);
         }
 
         // Top 3 fuel least efficient cars by country (advanced)
