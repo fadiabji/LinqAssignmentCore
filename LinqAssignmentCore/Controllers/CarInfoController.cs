@@ -246,18 +246,37 @@ namespace LinqAssignmentCore.Controllers
         // combined group and join (get 2 properties from manufacturer) - query syntax
         public ActionResult GroupJoinQ()
         {
-            
+            var GroupJoinQS = (from m in _db.Manufacturers.ToList()
+                               join c in _db.Cars.ToList()
+                               on m.Name equals c.Manufacturer
+                               into carsGruop
+                               select new GroupJoinVM
+                               { CarManufacturer = m,
+                                   CarBrands = (from c in carsGruop.ToList()
+                                                select c)
+                                                .OrderByDescending(c => c.Combined)
+                                                .Take(5)
+                                                .ToList()
 
-            return View();
+                               }).ToList();
+
+
+            return View(GroupJoinQS);
         }
 
         // Combined group and join (get 2 properties from manufacturer) - method syntax
         // Equality of keys
         public ActionResult GroupJoin()
         {
-           
-            return View();
-
+            var result = _db.Manufacturers.ToList().GroupJoin(_db.Cars.ToList(),
+                         m => m.Name,
+                         c => c.Manufacturer,
+                         (m, c) => new GroupJoinVM
+                             {
+                                 CarManufacturer = m,
+                                 CarBrands = _db.Cars.ToList().OrderByDescending(c => c.Combined).Take(5).ToList()
+                             }).ToList();
+            return View(result);
         }
 
         // Top 3 fuel efficient cars by country (advanced)
