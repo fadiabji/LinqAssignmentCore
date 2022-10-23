@@ -290,13 +290,19 @@ namespace LinqAssignmentCore.Controllers
                                select new GroupJoinSelectManyVM 
                                {
                                  Country = m.Headquarters,
-                                 CarBrands = _db.Cars.ToList()
+                                 CarBrands = carsGruop.ToList()
                                }).ToList();
 
-
-            var top3EfficientCarsByCountries = groupJoinList
-                                                .SelectMany(c => c.CarBrands)
-                                                .Distinct().OrderBy(c => c.Combined).Take(3).ToList();
+            var top3EfficientCarsByCountries = (from m in _db.Manufacturers.ToList()
+                                               join c in groupJoinList.ToList()
+                                               on m.Headquarters equals c.Country
+                                               into TopCountryEfflist
+                                               select new GroupJoinSelectManyVM
+                                               {
+                                                   Country = m.Headquarters,
+                                                   CarBrands = TopCountryEfflist.SelectMany(c => c.CarBrands)
+                                                   .OrderByDescending(c => c.Combined).Distinct().Take(3).ToList()
+                                               }).Distinct().ToList();
 
             return View(top3EfficientCarsByCountries);
         }
@@ -305,9 +311,28 @@ namespace LinqAssignmentCore.Controllers
         // GroupJoin + SelectMany (flattening sequence) - method syntax
         public ActionResult JoinAndGroupAndSelectMany()
         {
-            
+            var groupJoinList = _db.Manufacturers.ToList().GroupJoin(_db.Cars.ToList(),
+                                 m => m.Name,
+                                 c => c.Manufacturer,
+                                 (m,c) => new GroupJoinSelectManyVM
+                                 {
+                                     Country = m.Headquarters,
+                                     CarBrands = c.ToList()
+                                 }).ToList();
 
-            return View();
+           
+
+            var top3EfficientCarsByCountries = _db.Manufacturers.ToList().GroupJoin(groupJoinList.ToList(),
+                                                   m => m.Headquarters,
+                                                   g => g.Country,
+                                                   (m,g) => new  GroupJoinSelectManyVM
+                                                {
+                                                    Country = m.Headquarters,
+                                                    CarBrands = g.SelectMany(c => c.CarBrands)
+                                                    .OrderByDescending(c => c.Combined).Take(3).ToList()
+                                                }).Distinct().ToList();
+
+            return View(top3EfficientCarsByCountries.Distinct().ToList());
         }
 
         // Aggregating data (order by most efficient car) - query syntax
@@ -321,7 +346,15 @@ namespace LinqAssignmentCore.Controllers
         // Using class 'CarStatistics' to avoid iterating through list 3 times
         public ActionResult AggregatingData()
         {
-            
+            //string commaSeparatedStudentNames = _db.Cars.ToList().Aggregate(Car, AggregatingVM) => new AggregatingVM
+            //                            {
+            //                                Name = model.Name,
+            //                                Max = model.Highway,
+            //                                Min = model.City,
+            //                                Average = model.Combined
+            //                            };
+
+            //Console.WriteLine(commaSeparatedStudentNames);
             return View();
         }
     }
