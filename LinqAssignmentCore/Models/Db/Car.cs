@@ -18,6 +18,8 @@
         //Fuel efficency combined city - highway
         public int Combined { get; set; }
 
+        public virtual Engine Engine { get; set; } = null;
+
         public static List<Car> ProcessCars(string path)
         {
             List<Car> carList =

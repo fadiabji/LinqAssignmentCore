@@ -10,6 +10,7 @@ namespace LinqAssignmentCore.Data
         {
         }
 
+        public DbSet<Engine> Engines { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet<Manufacturer> Manufacturers { get; set; }
     }

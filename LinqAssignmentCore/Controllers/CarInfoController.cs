@@ -8,6 +8,10 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using System.Security.Cryptography;
+using System.Runtime.Intrinsics.X86;
+using System.Linq;
+using AspNetCore;
 
 namespace LinqAssignmentCore.Controllers
 {
@@ -346,16 +350,48 @@ namespace LinqAssignmentCore.Controllers
         // Using class 'CarStatistics' to avoid iterating through list 3 times
         public ActionResult AggregatingData()
         {
-            //string commaSeparatedStudentNames = _db.Cars.ToList().Aggregate(Car, AggregatingVM) => new AggregatingVM
-            //                            {
-            //                                Name = model.Name,
-            //                                Max = model.Highway,
-            //                                Min = model.City,
-            //                                Average = model.Combined
-            //                            };
+            var carsList = _db.Cars.ToList();
+            List<Manufacturer> manufacturers = _db.Manufacturers.ToList() ;
 
-            //Console.WriteLine(commaSeparatedStudentNames);
-            return View();
+            var aggregateData = carsList.GroupBy(c => c.Manufacturer)
+                .Select(g =>
+                {
+                    var result = g.Aggregate(new CarStatistics(),
+                        (acc, c) => acc.Accumulate(c),
+                        acc => acc.Compute());
+                    return new AggregatingVM()
+                    {
+                        Name = g.Key,
+                        Average = result.Average,
+                        Max = result.Max,
+                        Min = result.Min,
+                    };
+                })
+                .OrderByDescending(r => r.Max);
+
+
+
+            return View(aggregateData);
+        }
+
+
+
+        public ActionResult GetEngineInfo()
+        {
+
+            List<Engine> EnginesList = new List<Engine>
+            {
+                new Engine{MadeOf = "Aleminum",  FuelEfficiency = 33,  WeightKG = 350, Manufacutre  = "Audi", Cars = null},
+                new Engine{MadeOf = "Iron",  FuelEfficiency = 44,  WeightKG = 550, Manufacutre  = "Toyota", Cars = null},
+                new Engine{MadeOf = "AleminumIron",  FuelEfficiency = 35,  WeightKG = 450, Manufacutre  = "Mercides", Cars = null},
+                new Engine{MadeOf = "MixedMetal",  FuelEfficiency = 23,  WeightKG = 450, Manufacutre  = "BMW", Cars = null},
+                new Engine{MadeOf = "Aleminum",  FuelEfficiency = 23,  WeightKG = 350, Manufacutre  = "Vlovo", Cars = null},
+            };
+
+            _db.Engines.AddRange(EnginesList);
+            _db.SaveChanges();
+
+            return RedirectToAction("Queries");
         }
     }
 }
