@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.Security.Cryptography;
 using System.Runtime.Intrinsics.X86;
 using System.Linq;
-using AspNetCore;
+
 
 namespace LinqAssignmentCore.Controllers
 {
@@ -350,10 +350,10 @@ namespace LinqAssignmentCore.Controllers
         // Using class 'CarStatistics' to avoid iterating through list 3 times
         public ActionResult AggregatingData()
         {
-            var carsList = _db.Cars.ToList();
-            List<Manufacturer> manufacturers = _db.Manufacturers.ToList() ;
+            List<Car> carsList = _db.Cars.ToList();
+            List<Manufacturer> manufacturers = _db.Manufacturers.ToList();
 
-            var aggregateData = carsList.GroupBy(c => c.Manufacturer)
+            IEnumerable<AggregatingVM> aggregateData = carsList.GroupBy(c => c.Manufacturer)
                 .Select(g =>
                 {
                     var result = g.Aggregate(new CarStatistics(),
@@ -368,9 +368,6 @@ namespace LinqAssignmentCore.Controllers
                     };
                 })
                 .OrderByDescending(r => r.Max);
-
-
-
             return View(aggregateData);
         }
 
@@ -395,3 +392,4 @@ namespace LinqAssignmentCore.Controllers
         }
     }
 }
+
